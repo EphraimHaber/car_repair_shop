@@ -10,5 +10,6 @@ urlpatterns = [
     path('getAllWorkers/', views.get_all_workers),
     path('updateTestAppointment/', views.update_test_appointment),
     path('updateBreakdownFixed/', views.update_breakdown_fixed),
-    path('updateTestFixed/', views.update_test_fixed)
+    path('updateTestFixed/', views.update_test_fixed),
+    path('getUserDetails/', views.get_user_details)
 ]

@@ -12,6 +12,9 @@ from django.shortcuts import get_object_or_404
 
 from .models import TestAppointment, Breakdown, Car, Worker
 from .serializers import TestAppointmentSerializer, BreakdownSerializer, CarSerializer, WorkerSerializer
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 # Create your views here.
@@ -233,3 +236,22 @@ def get_all_workers(request):
     data = Worker.objects.all()
     deserialized_data = WorkerSerializer(data, many=True)
     return Response(deserialized_data.data, status=HTTP_200_OK)
+
+
+@api_view(['POST'])
+def get_user_details(request):
+    token = request.COOKIES.get('jwt')
+    if not token:
+        raise AuthenticationFailed('Unauthenticated!')
+    try:
+        payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+    except jwt.ExpiredSignatureError:
+        raise AuthenticationFailed('Unauthenticated!')
+    response = Response()
+    instance = User.objects.filter(id=payload['id']).first()
+    print("staff", instance.is_staff)
+    if instance is None:
+        response.data = {'message': 'fail'}
+        return response
+    response.data = {'data': f"{payload} \n{instance}"}
+    return response
