@@ -5,6 +5,9 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 import datetime
 import jwt
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny
+
 from .serializers import UserSerializer
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
@@ -26,6 +29,7 @@ class RegisterView(APIView):
         return Response(serializer.data)
 
 
+@permission_classes((AllowAny,))
 class LoginView(APIView):
     def post(self, request):
         print(request.data)
@@ -158,10 +162,6 @@ def logout_view(request):
 
 
 def all_users(request):
-    entries_list = list(User.objects.values())
-    debug = True
-    if debug:
-        return JsonResponse(entries_list, safe=False)
     if request.user.is_authenticated:
         temp = list(User.objects.filter(is_superuser=True))
         for i in range(len(temp)):

@@ -2,10 +2,11 @@ import jwt
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse, HttpRequest
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, renderer_classes
+from rest_framework_swagger.renderers import OpenAPIRenderer, SwaggerUIRenderer
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.parsers import JSONParser
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
 from django.shortcuts import get_object_or_404
@@ -138,7 +139,9 @@ def get_all_test_appointments(request):
 
 @api_view(["POST"])
 # @permission_classes((IsAuthenticated,))
+# @renderer_classes([SwaggerUIRenderer, OpenAPIRenderer])
 def add_breakdown(request):
+    stuff = request.q
     response = Response()
     token = request.COOKIES.get('jwt')
     if not token:
@@ -209,8 +212,9 @@ def get_peer_comparison(request):
 
 
 @api_view(["POST"])
-# @permission_classes((IsAuthenticated,))
+# @permission_classes((AllowAny,))
 def get_all_cars(request):
+
     # token = request.COOKIES.get('jwt')
     # if not token:
     #     raise AuthenticationFailed('Unauthenticated!')
