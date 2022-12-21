@@ -214,14 +214,8 @@ def get_peer_comparison(request):
 @api_view(["POST"])
 # @permission_classes((AllowAny,))
 def get_all_cars(request):
-
-    # token = request.COOKIES.get('jwt')
-    # if not token:
-    #     raise AuthenticationFailed('Unauthenticated!')
-    # try:
-    #     payload = jwt.decode(token, 'secret', algorithms=['HS256'])
-    # except jwt.ExpiredSignatureError:
-    #     raise AuthenticationFailed('Unauthenticated!')
+    user_id = get_user_id_from_auth_header(request.headers['Authorization'])
+    print("user ID", user_id)
     data = Car.objects.all()
     deserialized_data = CarSerializer(data, many=True)
     return Response(deserialized_data.data, status=HTTP_200_OK)
@@ -259,3 +253,10 @@ def get_user_details(request):
         return response
     response.data = {'data': f"{payload} \n{instance}"}
     return response
+
+
+def get_user_id_from_auth_header(auth_header: str) -> int:
+    prefix = 'Bearer '
+    token = auth_header[len(prefix):]
+    decoded = jwt.decode(token, options={"verify_signature": False})
+    return decoded['user_id']
